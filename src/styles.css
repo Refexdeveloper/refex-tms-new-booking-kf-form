@@ -28,6 +28,69 @@ body {
   max-width: 920px;
   margin: 0 auto;
   padding: 16px;
+  animation: nb-fade-up 0.4s ease both;
+}
+
+@keyframes nb-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes nb-fly {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+.nb-mode i {
+  font-size: 1.25rem;
+  color: var(--accent, var(--blue));
+}
+
+.nb-mode.active i.ri-flight-takeoff-line {
+  animation: nb-fly 1.5s ease-in-out infinite;
+}
+
+.nb-mode {
+  border: 1.5px solid var(--line);
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 2px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+}
+
+.nb-mode:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(45, 123, 191, 0.12);
+}
+
+.nb-flight {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  align-items: center;
+  transition: transform 0.15s ease, border-color 0.2s, background 0.2s;
+}
+
+.nb-flight:hover {
+  transform: translateY(-2px);
 }
 
 .nb-hero {
@@ -121,17 +184,6 @@ body {
   gap: 10px;
 }
 
-.nb-mode {
-  border: 1.5px solid var(--line);
-  background: #fff;
-  border-radius: 14px;
-  padding: 12px;
-  text-align: left;
-  cursor: pointer;
-  display: grid;
-  gap: 2px;
-}
-
 .nb-mode i {
   font-size: 1.25rem;
   color: var(--accent, var(--blue));
@@ -151,6 +203,8 @@ body {
   background: var(--soft);
   box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 18%, transparent);
 }
+
+/* removed duplicate .nb-mode block below was merged above */
 
 .nb-grid {
   display: grid;

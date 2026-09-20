@@ -1,17 +1,20 @@
 import { CLOUD_RUN } from './constants.js'
 
 const CITIES = [
-  { code: 'MAA', city: 'Chennai', display: 'Chennai (MAA)' },
-  { code: 'DEL', city: 'New Delhi', display: 'New Delhi (DEL)' },
-  { code: 'BOM', city: 'Mumbai', display: 'Mumbai (BOM)' },
-  { code: 'BLR', city: 'Bengaluru', display: 'Bengaluru (BLR)' },
-  { code: 'HYD', city: 'Hyderabad', display: 'Hyderabad (HYD)' },
-  { code: 'CCU', city: 'Kolkata', display: 'Kolkata (CCU)' },
-  { code: 'PNQ', city: 'Pune', display: 'Pune (PNQ)' },
-  { code: 'COK', city: 'Kochi', display: 'Kochi (COK)' },
-  { code: 'GOI', city: 'Goa', display: 'Goa (GOI)' },
-  { code: 'AMD', city: 'Ahmedabad', display: 'Ahmedabad (AMD)' },
+  { code: 'MAA', city: 'Chennai', display: 'Chennai (MAA)', country: 'IN' },
+  { code: 'DEL', city: 'New Delhi', display: 'New Delhi (DEL)', country: 'IN' },
+  { code: 'BOM', city: 'Mumbai', display: 'Mumbai (BOM)', country: 'IN' },
+  { code: 'BLR', city: 'Bengaluru', display: 'Bengaluru (BLR)', country: 'IN' },
+  { code: 'HYD', city: 'Hyderabad', display: 'Hyderabad (HYD)', country: 'IN' },
+  { code: 'CCU', city: 'Kolkata', display: 'Kolkata (CCU)', country: 'IN' },
+  { code: 'PNQ', city: 'Pune', display: 'Pune (PNQ)', country: 'IN' },
+  { code: 'COK', city: 'Kochi', display: 'Kochi (COK)', country: 'IN' },
+  { code: 'GOI', city: 'Goa', display: 'Goa (GOI)', country: 'IN' },
+  { code: 'AMD', city: 'Ahmedabad', display: 'Ahmedabad (AMD)', country: 'IN' },
 ]
+
+export const DEFAULT_FROM = CITIES[0]
+export const DEFAULT_TO = CITIES[1]
 
 export function todayIso() {
   return new Date().toISOString().slice(0, 10)
@@ -49,15 +52,70 @@ export async function searchAirports(q) {
   }
 }
 
-export async function searchFlights(body) {
+/** Same schema as refex-tms / flightsearch-kf-component */
+export function buildFlightSearchPayload({
+  tripType = 'oneWay',
+  from,
+  to,
+  depDate,
+  arrDate,
+  fareClass = 'Economy',
+  domesticInternational = 'Domestic',
+}) {
+  const fromCode = String(from?.code || '').toUpperCase()
+  const toCode = String(to?.code || '').toUpperCase()
+  const isInternational =
+    domesticInternational === 'International' ||
+    (from?.country && to?.country && from.country !== to.country)
+
+  const payload = {
+    tripType: tripType === 'roundTrip' ? 'roundTrip' : 'oneWay',
+    isInternational: Boolean(isInternational),
+    fareClass,
+    fromCity: fromCode,
+    toCity: toCode,
+    depDate,
+    noOfAdults: 1,
+    noOfChildren: 0,
+    noOfInfant: 0,
+    limit: 50,
+    maxResults: 50,
+    segments: [{ fromCity: fromCode, toCity: toCode, depDate }],
+  }
+  if (payload.tripType === 'roundTrip' && arrDate) payload.arrDate = arrDate
+  return payload
+}
+
+export async function searchFlights(params) {
+  const body = buildFlightSearchPayload(params)
   const res = await fetch(`${CLOUD_RUN}/api/flights/search`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(body),
   })
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(text || `Flight search failed (${res.status})`)
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || data.ok === false) {
+    const err = data.error
+    throw new Error(
+      typeof err === 'string' ? err : err ? JSON.stringify(err) : `Flight search failed (${res.status})`
+    )
   }
-  return res.json()
+  const result = data.result || {}
+  if (String(result.status || '').toLowerCase() === 'failed') {
+    throw new Error('Provider returned Failed — no fare options')
+  }
+  const opts = (result.options || []).map((o, i) => ({
+    ...o,
+    id: o.id || `${o.airlineCode}-${o.flightNumber}-${i}`,
+    airlineName: o.airlineName || o.airline,
+    airlineCode: o.airlineCode,
+    departureTime: o.departureTime || o.depTime,
+    arrivalTime: o.arrivalTime || o.arrTime,
+    sourceCityCode: o.sourceCityCode || body.fromCity,
+    destinationCityCode: o.destinationCityCode || body.toCity,
+    totalFare: o.totalFare ?? o.fare ?? 0,
+    currencyCode: o.currencyCode || result.currencyCode || 'INR',
+    stops: o.stops ?? o.stopCount ?? 0,
+  }))
+  return { options: opts, meta: { uuid: result.uuid || '', request: body } }
 }

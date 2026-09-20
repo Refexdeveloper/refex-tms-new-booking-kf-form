@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { kf } from '../sdk'
 import { FIELDS, MODES, modeLabel } from './constants.js'
-import { formatMoney, searchAirports, searchCities, searchFlights, todayIso } from './api.js'
+import { formatMoney, searchAirports, searchCities, searchFlights, todayIso, DEFAULT_FROM, DEFAULT_TO } from './api.js'
 
 function initials(name) {
   return String(name || 'U')
@@ -94,8 +94,8 @@ export default function NewBookingForm() {
   const [domesticInternational, setDomesticInternational] = useState('Domestic')
   const [beneficiary, setBeneficiary] = useState('Self')
   const [travelType, setTravelType] = useState('oneWay')
-  const [from, setFrom] = useState(null)
-  const [to, setTo] = useState(null)
+  const [from, setFrom] = useState(DEFAULT_FROM)
+  const [to, setTo] = useState(DEFAULT_TO)
   const [city, setCity] = useState(null)
   const [departureDate, setDepartureDate] = useState(todayIso())
   const [returnDate, setReturnDate] = useState('')
@@ -188,24 +188,33 @@ export default function NewBookingForm() {
 
   async function onSearchFlights() {
     if (!from?.code || !to?.code) {
-      setError('Select From and To airports.')
+      setError('Select From and To airports from suggestions.')
       return
     }
-    if (travelType === 'roundTrip' && returnDate && returnDate <= departureDate) {
-      setError('Return date must be after departure.')
-      return
+    if (travelType === 'roundTrip') {
+      if (!returnDate) {
+        setError('Return date is required for round trip.')
+        return
+      }
+      if (returnDate <= departureDate) {
+        setError('Return date must be after departure.')
+        return
+      }
     }
     setSearching(true)
     setError('')
     setOk('')
+    setSelectedFlight(null)
     try {
-      const data = await searchFlights({
+      const { options } = await searchFlights({
         tripType: travelType === 'roundTrip' ? 'roundTrip' : 'oneWay',
+        from,
+        to,
+        depDate: departureDate,
+        arrDate: returnDate,
         fareClass: 'Economy',
-        segments: [{ from, to, date: departureDate }],
-        returnDate: travelType === 'roundTrip' ? returnDate : undefined,
+        domesticInternational,
       })
-      const options = data.options || data.flights || data.results || []
       setFlights(options)
       setOk(options.length ? `${options.length} flights found` : 'No flights returned')
     } catch (e) {
@@ -224,7 +233,7 @@ export default function NewBookingForm() {
       return
     }
     if (isAir && !selectedFlight) {
-      setError('Search and select a flight before saving.')
+      setError('Search and select a flight before submitting.')
       return
     }
     if (isGround && (!from || !to || !departureDate)) {
@@ -242,8 +251,17 @@ export default function NewBookingForm() {
     setSaving(true)
     try {
       await syncToKissflow()
-      setOk('Saved to Travel Management form fields. Use Kissflow Save / Submit to continue workflow.')
-      if (kf?.client?.showInfo) kf.client.showInfo('Travel booking details saved')
+      // Best-effort native submit if Form context exposes it
+      if (typeof kf?.context?.submit === 'function') {
+        await kf.context.submit()
+        setOk('Submitted — Travel Desk workflow started.')
+      } else if (typeof kf?.context?.save === 'function') {
+        await kf.context.save()
+        setOk('Saved to Kissflow. Click Submit on the form footer to start workflow.')
+      } else {
+        setOk('Fields synced. Click Kissflow Submit to start Travel Desk → Manager workflow.')
+      }
+      if (kf?.client?.showInfo) kf.client.showInfo('Travel booking saved')
     } catch (e) {
       setError(e.message || 'Save failed')
     } finally {
