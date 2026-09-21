@@ -1,16 +1,16 @@
 import { CLOUD_RUN } from './constants.js'
 
 const CITIES = [
-  { code: 'MAA', city: 'Chennai', display: 'Chennai (MAA)', country: 'IN' },
-  { code: 'DEL', city: 'New Delhi', display: 'New Delhi (DEL)', country: 'IN' },
-  { code: 'BOM', city: 'Mumbai', display: 'Mumbai (BOM)', country: 'IN' },
-  { code: 'BLR', city: 'Bengaluru', display: 'Bengaluru (BLR)', country: 'IN' },
-  { code: 'HYD', city: 'Hyderabad', display: 'Hyderabad (HYD)', country: 'IN' },
-  { code: 'CCU', city: 'Kolkata', display: 'Kolkata (CCU)', country: 'IN' },
-  { code: 'PNQ', city: 'Pune', display: 'Pune (PNQ)', country: 'IN' },
-  { code: 'COK', city: 'Kochi', display: 'Kochi (COK)', country: 'IN' },
-  { code: 'GOI', city: 'Goa', display: 'Goa (GOI)', country: 'IN' },
-  { code: 'AMD', city: 'Ahmedabad', display: 'Ahmedabad (AMD)', country: 'IN' },
+  { code: 'MAA', city: 'Chennai', name: 'Chennai International Airport', display: 'Chennai (MAA)', country: 'IN' },
+  { code: 'DEL', city: 'New Delhi', name: 'Indira Gandhi International Airport', display: 'New Delhi (DEL)', country: 'IN' },
+  { code: 'BOM', city: 'Mumbai', name: 'Chhatrapati Shivaji Maharaj International Airport', display: 'Mumbai (BOM)', country: 'IN' },
+  { code: 'BLR', city: 'Bengaluru', name: 'Kempegowda International Airport', display: 'Bengaluru (BLR)', country: 'IN' },
+  { code: 'HYD', city: 'Hyderabad', name: 'Rajiv Gandhi International Airport', display: 'Hyderabad (HYD)', country: 'IN' },
+  { code: 'CCU', city: 'Kolkata', name: 'Netaji Subhas Chandra Bose International Airport', display: 'Kolkata (CCU)', country: 'IN' },
+  { code: 'PNQ', city: 'Pune', name: 'Pune Airport', display: 'Pune (PNQ)', country: 'IN' },
+  { code: 'COK', city: 'Kochi', name: 'Cochin International Airport', display: 'Kochi (COK)', country: 'IN' },
+  { code: 'GOI', city: 'Goa', name: 'Goa International Airport', display: 'Goa (GOI)', country: 'IN' },
+  { code: 'AMD', city: 'Ahmedabad', name: 'Sardar Vallabhbhai Patel International Airport', display: 'Ahmedabad (AMD)', country: 'IN' },
 ]
 
 export const DEFAULT_FROM = CITIES[0]
