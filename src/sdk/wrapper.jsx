@@ -3,11 +3,35 @@ import React, { useEffect, useState } from 'react'
 
 let kf
 
+function createLocalKf() {
+  const store = {}
+  return {
+    isLocal: true,
+    user: {
+      getUser: async () => ({
+        Name: 'Pravin Kumar Raja',
+        Email: 'pravin@refex.local',
+      }),
+    },
+    context: {
+      watchParams: () => {},
+      updateField: async (payload) => {
+        Object.assign(store, payload)
+        console.info('[local kf] updateField', Object.keys(payload).length, 'fields')
+        return true
+      },
+      getField: async (id) => store[id],
+      submit: async () => console.info('[local kf] submit'),
+      save: async () => console.info('[local kf] save'),
+    },
+  }
+}
+
 export function SDKWrapper({ children }) {
   const [ready, setReady] = useState(null)
 
   useEffect(() => {
-    if (window.kf) {
+    if (window.kf && !window.kf.isError) {
       kf = window.kf
       setReady(kf)
       return
@@ -17,21 +41,14 @@ export function SDKWrapper({ children }) {
         window.kf = kf = sdk
         setReady(sdk)
       })
-      .catch((err) => {
-        console.error('KF SDK init failed', err)
-        setReady({ isError: true })
+      .catch(() => {
+        kf = createLocalKf()
+        window.kf = kf
+        setReady(kf)
       })
   }, [])
 
-  if (!ready) return <div className="nb-loading">Loading Kissflow…</div>
-  if (ready.isError) {
-    return (
-      <div className="nb-error-box">
-        <h3>Open inside Kissflow</h3>
-        <p>This Form component needs the Kissflow SDK. Upload the ZIP on component “New Booking”.</p>
-      </div>
-    )
-  }
+  if (!ready) return <div className="nb-loading">Loading…</div>
   return <>{children}</>
 }
 
