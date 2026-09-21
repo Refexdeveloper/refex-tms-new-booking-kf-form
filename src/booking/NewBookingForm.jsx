@@ -273,11 +273,13 @@ export default function NewBookingForm() {
     <div className="nb-root">
       <header className="nb-hero">
         <div>
-          <p className="nb-kicker">NEW BOOKING</p>
+          <p className="nb-kicker">
+            <i className="ri-file-list-3-line" /> Travel Request
+          </p>
           <h1>
             {greeting}, {(requester.name || 'Traveller').split(' ')[0]}!
           </h1>
-          <p>Complete travel request in one form — synced to Travel Management.</p>
+          <p>Replace Kissflow default fields — synced to Travel_Management_A02.</p>
         </div>
         <div className="nb-requester">
           <span className="nb-avatar">{initials(requester.name)}</span>
@@ -290,7 +292,7 @@ export default function NewBookingForm() {
       </header>
 
       <section className="nb-card">
-        <h2>What are you travelling by?</h2>
+        <h2>1. Travel mode</h2>
         <div className="nb-modes">
           {MODES.map((m) => (
             <button
@@ -315,7 +317,7 @@ export default function NewBookingForm() {
       </section>
 
       <section className="nb-card">
-        <h2>Trip details</h2>
+        <h2>2. Request & booking details</h2>
         <div className="nb-grid">
           <div className="nb-field nb-span-2">
             <label>Purpose of travel *</label>
@@ -489,7 +491,7 @@ export default function NewBookingForm() {
 
         <div className="nb-actions">
           <button type="button" className="nb-btn primary" disabled={saving} onClick={onSave}>
-            {saving ? 'Saving…' : 'Save to Kissflow form'}
+            {saving ? 'Saving…' : 'Save to Kissflow & continue'}
           </button>
         </div>
       </section>

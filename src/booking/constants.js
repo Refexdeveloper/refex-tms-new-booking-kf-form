@@ -42,12 +42,12 @@ export const FIELDS = {
 export const CLOUD_RUN = 'https://refex-tms-flightsearch-dhwffeu7pq-el.a.run.app'
 
 export const MODES = [
-  { id: 'air', label: 'Flight', icon: 'ri-flight-takeoff-line', sub: 'Domestic & International', accent: '#2d7bbf', soft: '#e8f4fc' },
-  { id: 'train', label: 'Train', icon: 'ri-train-line', sub: 'Across India', accent: '#70b62c', soft: '#e8f6e0' },
-  { id: 'bus', label: 'Bus', icon: 'ri-bus-line', sub: 'Pan India Travel', accent: '#e88a2d', soft: '#fff3e0' },
-  { id: 'flightHotel', label: 'Flight + Hotel', icon: 'ri-plane-line', sub: 'Complete Travel', accent: '#6b5ce7', soft: '#eeeffb' },
-  { id: 'accommodation', label: 'Hotel', icon: 'ri-hotel-line', sub: 'Stay with comfort', accent: '#8b5cf6', soft: '#f5e8ff' },
-  { id: 'cab', label: 'Cab', icon: 'ri-taxi-line', sub: 'Airport & Local', accent: '#4f6bed', soft: '#e8eeff' },
+  { id: 'air', label: 'Flight', icon: 'ri-flight-takeoff-line', sub: 'Domestic & International', accent: '#1E88E5', soft: '#EFF6FF' },
+  { id: 'train', label: 'Train', icon: 'ri-train-line', sub: 'Across India', accent: '#0084AD', soft: '#E0F7FA' },
+  { id: 'bus', label: 'Bus', icon: 'ri-bus-line', sub: 'Pan India Travel', accent: '#F97316', soft: '#FFF7ED' },
+  { id: 'flightHotel', label: 'Flight + Hotel', icon: 'ri-hotel-bed-line', sub: 'Complete Travel', accent: '#2B5AED', soft: '#EEF2FF' },
+  { id: 'accommodation', label: 'Hotel', icon: 'ri-building-line', sub: 'Stay with comfort', accent: '#8B5CF6', soft: '#F5F3FF' },
+  { id: 'cab', label: 'Cab', icon: 'ri-taxi-line', sub: 'Airport & Local', accent: '#0F766E', soft: '#ECFDF5' },
 ]
 
 export function modeLabel(mode) {
